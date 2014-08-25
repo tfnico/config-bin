@@ -1,11 +1,25 @@
-git filter-branch -f --commit-filter '
-        if [ "$GIT_COMMITTER_NAME" = "Thomas Ferris Nicolaisen" ];
-        then
-                GIT_COMMITTER_NAME="Thomas Ferris Nicolaisen";
-                GIT_AUTHOR_NAME="Thomas Ferris Nicolaisen";
-                GIT_COMMITTER_EMAIL="thomas.nicolaisen@viaboxx.de";
-                GIT_AUTHOR_EMAIL="thomas.nicolaisen@viaboxx.de";
-                git commit-tree "$@";
-        else
-                git commit-tree "$@";
-        fi' HEAD
+export NAME="Thomas Ferris Nicolaisen"
+export NEW_EMAIL="thomas.nicolaisen@viaboxx.de"
+
+git filter-branch --env-filter '
+an="$GIT_AUTHOR_NAME"
+am="$GIT_AUTHOR_EMAIL"
+cn="$GIT_COMMITTER_NAME"
+cm="$GIT_COMMITTER_EMAIL"
+
+if [ "$GIT_COMMITTER_NAME" = "$NAME" ]
+then
+    cn="$NAME"
+    cm="$NEW_EMAIL"
+fi
+if [ "$GIT_AUTHOR_NAME" = "$NAME" ]
+then
+    an="$NAME"
+    am="$NEW_EMAIL"
+fi
+
+export GIT_AUTHOR_NAME="$an"
+export GIT_AUTHOR_EMAIL="$am"
+export GIT_COMMITTER_NAME="$cn"
+export GIT_COMMITTER_EMAIL="$cm"
+'
